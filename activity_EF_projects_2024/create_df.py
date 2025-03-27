@@ -17,7 +17,7 @@ __status__ = "Production"
 # Review History   #
 ####################
 
-# Reviewed by 
+# Reviewed by Eva Koderman 27032025
 
 # %%
 ####################
@@ -26,19 +26,19 @@ __status__ = "Production"
 
 # Standard imports  ###
 import numpy as np
-import pandas as pd  # version 1.1.5
+import pandas as pd  # version 1.1.5 #EK: You can either provide versions for all imports or leave it out cause they are provided in your requirements.txt anyway
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pyreadstat
 
-# Third party imports ###
+# Third party imports ###   #EK: you can delete this line
 
 
 #%%
 
 #Load in all subjects that included in the sudy (N = 37), including bilateral tumors 
 
-li_subs = pd.read_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/01_subjects/all_subs_list.csv")
+li_subs = pd.read_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/01_subjects/all_subs_list.csv") #EK: better to make this a generic path before making it public?
 
 #%%
 
@@ -47,7 +47,7 @@ li_subs = pd.read_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023
 #script copied from 2022_activity_network project masks.py
 
 
-def calc_perc_overlap(all_subs, path, name_overlap_file,name_volume_file, area):
+def calc_perc_overlap(all_subs, path, name_overlap_file,name_volume_file, area): #EK: ensure consistent spacing
     """
     Function to calculate the percentage overlap of the tumor and the peritumoral area
     with the 210 gray matter BNA regions for every patient. Importantly it takes the lateralization into account, 
@@ -82,8 +82,8 @@ def calc_perc_overlap(all_subs, path, name_overlap_file,name_volume_file, area):
         # get overlaps and volumes (first cols: number of voxels, second cols: cubic volume) of tumor from overlap file
         file_overlap = f"{path}{sub}/{name_overlap_file}"
         df_overlap = pd.read_csv(file_overlap, sep=" ", header=None)
-        df_overlap.columns = ["voxels_overlap", "volumes_overlap", "Nan"]
-        df_overlap = df_overlap.iloc[0:210]
+        df_overlap.columns = ["voxels_overlap", "volumes_overlap", "Nan"] #EK: Why is there a 'Nan'column?
+        df_overlap = df_overlap.iloc[0:210] #EK: the 0 is redundant as python indexing starts at 0 by default -> could rewrite df_overlap.iloc[:210]
    
         # get volumes of all regions
         file_volumes = f"{path}{sub}/{name_volume_file}"
@@ -108,7 +108,6 @@ def calc_perc_overlap(all_subs, path, name_overlap_file,name_volume_file, area):
         
         print(df_full.shape)
   
-    
         #get the lateralization of the tumor 
         lateralization = all_subs.loc[all_subs["Case_ID"] == sub,"lateralization"].values[0]
         
@@ -117,23 +116,24 @@ def calc_perc_overlap(all_subs, path, name_overlap_file,name_volume_file, area):
         ### LATERALIZATION OF TUMOR #### (important for step when creating peritumoral df) 
     
         #filter the overlap based on the lateralization of the tumor, to filter out wrong overlaps
-        df_full["perc_filt"] = df_full["perc"]
+        df_full["perc_filt"] = df_full["perc"] #EK: Not sure about this but it seems a bit redundant to me?
         
         #define condition that checks if roi is even (right) or uneven (left)
         is_even = df_full["roi"] % 2 == 0
             
         #make all percentage overlap 0 for right regions (even number roi) if the lateralization is left 
         if (df_full["lateralization"] == "left").all():
-            
             df_full.loc[is_even, "perc_filt"] =  0
             
         #make all percentage overlap 0 for left regions (odd number roi) if the lateralization if right 
         elif (df_full["lateralization"] == "right").all():
-            
             df_full.loc[~is_even, "perc_filt"] = 0
         
-        ### Peritumoral area ### commented out when calculating resection cavitys --> take all healthy regions around the cavity, no matter the overlap with the mask
+        ### Peritumoral area ### commented out when calculating resection cavities --> take all healthy regions around the cavity, no matter the overlap with the mask
         # define peritumoral regions as regions that have 12% or more overlap with the tumor
+        # EK: why 12%? maybe provide just a very short argument for this exact cut-off?
+        # EK: Commenting out lines of code based on use case is not the most optimal approach (you need to search for line, ...). If you have time, I would implement it in such a way that you pass it in the function as an input arg and make here a short if/else statement.
+
         df_full[f"{area}"] = df_full["perc_filt"].apply(lambda x: 1 if x >= 12 else 0)
         #df_full[f"{area}"] = "NA" #because dont define regions like this for cavity
         
@@ -150,7 +150,7 @@ def calc_perc_overlap(all_subs, path, name_overlap_file,name_volume_file, area):
 
 #%%
 all_subs = li_subs
-path = "/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/02_tumormasks/"
+path = "/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/02_tumormasks/" #EK: generic path? You can change it to a relative path: path = "./data/tumormasks/"
 name_overlap_file = "bna_gm_TumorOverlapVolume.txt"
 name_volume_file = "bna_gm_RoiVolumes.txt"
 area = "tumor" 
@@ -207,6 +207,9 @@ plt.title("Perc overlap peri-tumor")
 
 #%%
 
+# EK: This is a really long script - maybe consider splitting it into two or more? This line seems like a good point to split
+# EK: Also the naming of the file can then be done based on the functions you're defining or the steps you're making - currently create_df.py seems a bit broad
+
 ### EXTRACT IPSILATERAL FPN (EXCLUDING TUMORAL/PERITUMORAL AREA) ###
 
 #Define FPN regions 
@@ -227,7 +230,7 @@ df_patients_FU_std.reset_index(drop = True, inplace = True)
 def make_lateralized_df(df_activity, df_overlaps, area):
     """
     Function to concatenate the activity and overlaps dataframes and return only the rows 
-    belongig to the ipsilateral FPN.Also removes the regions that fall into the tumoral areas
+    belongig to the ipsilateral FPN. Also removes the regions that fall into the tumoral areas
     to purely obtain ipsilateral FPN regions.
     
 
@@ -242,7 +245,7 @@ def make_lateralized_df(df_activity, df_overlaps, area):
 
     Returns
     -------
-    None.
+    None. #EK: Maybe add an additional comment that it doesn't return anything but that instead it modifies the df_activity and df_overlaps?
 
     """
 
@@ -264,16 +267,12 @@ def make_lateralized_df(df_activity, df_overlaps, area):
     print(df_overlaps_filt.shape)
     print(df_concat.shape)
     print(df_concat.head())
- 
     
     ### Construct ipsilateral or contralateral dataframes ###
-    # This part was coded with the help of Chatgpt 
+    # This part was coded with the help of Chatgpt # EK: This comment is very nice and honest :D but maybe at this day and age redundant?
     #define the masks for the lateralization
     left_mask = df_concat["lateralization"] == "left"
-    
     right_mask = df_concat["lateralization"] == "right"
-    
-    
     
     if area == "ipsilateral":
         
@@ -288,10 +287,10 @@ def make_lateralized_df(df_activity, df_overlaps, area):
     elif area == "contralateral":
         
         #apply filters to obtain desired rows 
-        left_df = df_concat[left_mask].loc[df_concat["roi"].isin(right_FPN)]#if subject has left tumor, retain only right areas
+        left_df = df_concat[left_mask].loc[df_concat["roi"].isin(right_FPN)] #if subject has left tumor, retain only right areas
         left_df.reset_index(drop = True, inplace = True)
         
-        right_df = df_concat[right_mask].loc[df_concat["roi"].isin(left_FPN)]#if subject has right tumor, retain only left areas
+        right_df = df_concat[right_mask].loc[df_concat["roi"].isin(left_FPN)] #if subject has right tumor, retain only left areas
         right_df.reset_index(drop = True, inplace = True)
         
     #put dataframes back together to obtain dataframe with only ipsilateral/contralateral rois
@@ -315,6 +314,8 @@ df_concat_contra, df_contra, df_contra_pure, df_overlaps_filt_contra = make_late
 
 #df_ipsi_pure.to_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/03_dataframes/20232006_dataframe_baseline_ipsilateral_excl_peritumoral.csv")
 #df_contra_pure.to_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/03_dataframes/20232006_dataframe_baseline_contralateral_excl_peritumoral.csv")
+
+# EK: Remove the commented lines or make them into a relative path or uncomment them?
 
 #%%
 #1-YEAR FU
@@ -342,13 +343,14 @@ df_contra_averaged_FU = df_contra_pure_FU.groupby("sub").mean(numeric_only = Tru
 #df_ipsi_averaged_FU.to_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/03_dataframes/20232006_dataframe_FU_ipsilateral_excl_peritumoral_averaged.csv")
 #df_contra_averaged_FU.to_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/03_dataframes/20232006_dataframe_FU_contralateral_excl_peritumoral_averaged.csv")
 
+#EK: Another potential split of this script into a separate file
 
 #%%
 ### Construct dataframe for the TUMORAL/PERITUMORAL/CAVITY/ENHANCING TUMOR AREA ###
 
-#also includes bilateral tumors 
+# also includes bilateral tumors 
 
-#concatenate baseline std activity dataframe (make sure that includes also sub-0066 that bilateral) and overlaps dataframe 
+#concatenate baseline std activity dataframe (make sure that includes also sub-0066 that bilateral) and overlaps dataframe  #EK: what is so special about sub-0066?
 #dataframe preparation
 
 def make_area_df(df_activity, df_overlaps):
@@ -364,7 +366,7 @@ def make_area_df(df_activity, df_overlaps):
 
     Returns
     -------
-    pd.DatFrame, 
+    pd.DataFrame, 
         contains the data filtered for only peritumoral data
 
     """
@@ -382,7 +384,7 @@ def make_area_df(df_activity, df_overlaps):
     #select only data of the peritumoral area (comment out when looking at cavity or enhancing tumor)
    # df_area_filt = df_concat[df_concat["peritumor"] == 1]
     
-    #select only data of area that interested in (comment out when looking at peritumoral area)
+    #select only data of area that interested in (comment out when looking at peritumoral area) #EK: Again - commenting out not the most optimal - consider implementing that as an input arg
     df_area_filt = df_concat[df_concat["perc_filt"]>0]
     
     return(df_area_filt)
@@ -391,7 +393,6 @@ def make_area_df(df_activity, df_overlaps):
 #load in standardized dataframes from baseline and FU
 df_patients_baseline_std = pd.read_csv("/data/anw/anw-work/MULTINET/culrich/03_analysis/02_standardization_for_df/df_activity_standardized_patients_baseline.csv")
 df_patients_baseline_std.reset_index(drop = True, inplace = True)
-
 
 df_patients_FU_std = pd.read_csv("/data/anw/anw-work/MULTINET/culrich/03_analysis/02_standardization_for_df/df_activity_standardized_patients_FU.csv")
 df_patients_FU_std.reset_index(drop = True, inplace = True)
@@ -446,11 +447,12 @@ df_cavity_check = pd.read_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_proje
 # remove sub-0054 from resection cavity overlaps as will only include them in enhancing tumor (has an enhancing tumor rim)
 df_cavity = df_cavity[df_cavity["sub"]!= "sub-0054"]
 #df_cavity.to_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/03_dataframes/20240214_dataframe_baseline_cavity.csv")
+
 #%%
 #FU
 df_cavity_FU = make_area_df(df_patients_FU_std, df_cavity_overlaps)
 
-# remove sub-0054 from resection cavity overlaps as will only include them in enhancing tumor (has an enhancing tumor rim)
+# remove sub-0054 from resection cavity overlaps as will only include them in enhancing tumor (has an enhancing tumor rim) #EK: Consider implementing automatic checks for these kinds of outliers, so you don't need to input the subject number manually
 df_cavity_FU = df_cavity_FU[df_cavity_FU["sub"]!= "sub-0054"]
 #df_cavity_FU.to_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/03_dataframes/20240214_dataframe_FU_cavity.csv")
 
@@ -491,6 +493,7 @@ df_enhancing_tumor_FU_avg = df_enhancing_tumor_FU.groupby("sub", as_index=False)
 df_enhancing_tumor_combined = pd.merge(df_enhancing_tumor_avg, df_enhancing_tumor_FU_avg, on="sub", suffixes = ('_T1', '_T2'))
 #df_enhancing_tumor_combined.to_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/03_dataframes/20240214_dataframe_enhancing_tumor_averaged_baseline_FU_combined.csv")
 
+# EK: This is the best possible split of this one long file - separate into make_dfs.py and preprocess_dfs.py or smth like that
 
 #%%
 ###########################################
@@ -502,16 +505,15 @@ df_enhancing_tumor_combined = pd.merge(df_enhancing_tumor_avg, df_enhancing_tumo
 df_cavity_avg["MM"] = "T1_Baseline"
 df_cavity_FU_avg["MM"] = "T2_FU"
 
-#concatenate the two dataframesin long format, needed for R ANOVA analysis
+#concatenate the two dataframes in long format, needed for R ANOVA analysis
 df_cavity_combined_long = pd.concat([df_cavity_avg, df_cavity_FU_avg], axis =0)
 df_cavity_combined_long.reset_index(inplace= True)
-
 
 #%%
 #Prepare clinical covariates (progression, epilepsy and molecular info) 
 
 #progression
-#Subjects that have progression before FU MEG or within 4 months after (N = 10)
+#Subjects that have progression before FU MEG or within 4 months after (N = 10) #EK: Consider loading the csv file of the MN database or the original database where these subjects are inputted and reading about their progression status from there instead of manually writing out their numbers
 li_prog = ["sub-0017", "sub-0054", "sub-0069", "sub-0085",  "sub-0086", "sub-0099", "sub-9012", "sub-9022", "sub-9029", "sub-9032"]
 df_cavity_combined_long["progression"] = df_cavity_combined_long["sub"].apply(lambda x: 'progression' if x in li_prog else 'no_progression')
 
@@ -656,8 +658,6 @@ df_peri_mol = pd.merge(df[["Case_ID", "IDH_1p19q"]],df_peri, on = "Case_ID", how
 
 
 
-
-
 #%% 
 ####### PREPARATION COX PFS AND SURVIVAL ANALYSIS #########
 #Prepare a dataframe for the different areas including
@@ -670,7 +670,7 @@ df_cavity_delta = pd.read_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_proje
 
 
 #%%
-def prepare_df_COX(df, area):
+def prepare_df_COX(df, area): # EK: general comment - for short functions like this you can provide the argument type like so: def prepare_df_COX(df: pd.DataFrame, area: str)
     
     #BB_welch_z
     #calculate absolute difference between T1 and T2
@@ -688,6 +688,7 @@ def prepare_df_COX(df, area):
     
     #df.to_csv(f"/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/03_dataframes/20240226_dataframe_{area}_delta_perc_change_no_covs.csv")
 
+    # EK: if you keep the commented line above then the area argument is never used?
     return(df)
 
 #%%
@@ -696,7 +697,7 @@ df_cavity_change = prepare_df_COX(df_cavity_delta, "cavity")
 
 #%%
 ### further prepare dataframe for COX hazards analysis 
-#loadin df containing all patients and change metrics 
+#loading df containing all patients and change metrics 
 #df_cavity_change= pd.read_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/03_dataframes/20240226_dataframe_cavity_delta_perc_change_no_covs.csv")
 
 #%%
@@ -726,3 +727,6 @@ df_cavity_change_met_covariates_and_PFS = pd.merge(df[["Case_ID", "progr", "PFS_
 #%%
 
 df_cavity_change_met_covariates_and_PFS.to_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/03_dataframes/20240228_dataframe_cavity_delta_perc_change_no_prog_covs.csv")
+
+# EK: general comment - consider going over the script and uncomment the many commented lines? Or think about alternatives - either remove them or make them into a relative path
+# EK: the file is a bit too long - based on chatGPT a python script should not exceed 500 lines
