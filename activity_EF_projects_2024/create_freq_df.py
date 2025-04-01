@@ -20,7 +20,7 @@ __status__ = "Production"
 # Review History   #
 ####################
 
-# Reviewed by 
+# Reviewed by Eva Koderman 01/04/2025
 
 
 
@@ -93,7 +93,7 @@ def make_rel_power_df(df_pat, df_HC, df_overlaps, sub_ids, freq, MM):
     
     return(df_peri_mean)
 
-#%%
+#%% # EK: remove or pseudo-code actual subject numbers
 #sub_ids = ['sub-0017','sub-0029', 'sub-0045', 'sub-0050', 'sub-0054', 'sub-0066', 'sub-0068','sub-0069', 'sub-0077', 'sub-0083', 'sub-0085', 'sub-0086', 'sub-0087', 'sub-0094', 'sub-0099', 'sub-0100', 'sub-0106', 'sub-0115', 'sub-9005','sub-9007', 'sub-9009', 'sub-9010', 'sub-9012', 'sub-9014', 'sub-9018','sub-9022', 'sub-9029', 'sub-9030', 'sub-9031', 'sub-9032', 'sub-9034','sub-9036', 'sub-9038', 'sub-9040', 'sub-9045', 'sub-9083']
 #MM = 'baseline'
 
@@ -106,7 +106,7 @@ def make_rel_power_df(df_pat, df_HC, df_overlaps, sub_ids, freq, MM):
 sub_ids = ['sub-9010']
 MM = 'T4'
 
-#DEFINE INPUTS
+#DEFINE INPUTS # EK: consider using relative paths
 df_overlaps = pd.read_csv('/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/03_dataframes/peri_overlaps.csv')
 df_overlaps = df_overlaps.loc[df_overlaps['sub'].isin(sub_ids)] #only include the subjects that want to include for the timepoint
 print(df_overlaps.shape) 
@@ -170,4 +170,5 @@ df_peri_FU['MM'] = 'FU'
 
 df_both_timepoints = pd.concat([df_peri_baseline, df_peri_FU], axis = 0)
 df_both_timepoints.to_csv('/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/03_dataframes/20240517_std_rel_power_both_timepoints.csv')
-    
+
+# EK: similar general comments like create_df.py - see there
