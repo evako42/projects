@@ -3,7 +3,7 @@
 """
 
 
-In this script I prepare the dataframes for the main statistical analysis.
+In this script I prepare the dataframes for the main statistical analysis. #EK: could be more descriptive - which dataframes? 
 
 
 """
@@ -24,21 +24,21 @@ __status__ = "Production"
 # Libraries        #
 ####################
 
-# Standard imports  ###
-import numpy as np
+# Standard imports  ### 
+import numpy as np # EK: add all versions or none (as they're saved in requirements.txt) but try to be consistent
 import pandas as pd  # version 1.1.5
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pyreadstat
 
-# Third party imports ###
+# Third party imports ###    #EK: can delete this line
 
 
 #%%
 
 #Load in all subjects that included in the sudy (N = 37), including bilateral tumors 
 
-li_subs = pd.read_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/01_subjects/all_subs_list.csv")
+li_subs = pd.read_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/01_subjects/all_subs_list.csv")    #EK: make a general relative path
 
 #%%
 
@@ -267,7 +267,7 @@ def make_lateralized_df(df_activity, df_overlaps, area):
  
     
     ### Construct ipsilateral or contralateral dataframes ###
-    # This part was coded with the help of Chatgpt 
+    # This part was coded with the help of Chatgpt             #EK: this line is a bit redundant in this day and age? :D
     #define the masks for the lateralization
     left_mask = df_concat["lateralization"] == "left"
     
@@ -379,7 +379,7 @@ def make_area_df(df_activity, df_overlaps):
     #df_concat = pd.merge(df_activity, df_overlaps, left_index = True, right_index = True) #this only works when the same subjects are included in both dataframes i.e. when the indices are the same.
     df_concat = pd.merge(df_activity, df_overlaps, on = ["sub", "roi"], how = "inner")
     
-    #select only data of the peritumoral area (comment out when looking at cavity or enhancing tumor)
+    #select only data of the peritumoral area (comment out when looking at cavity or enhancing tumor) # EK: this is not the most optimal coding practice (commenting out) - consider rephrasing it as an input argument
    # df_area_filt = df_concat[df_concat["peritumor"] == 1]
     
     #select only data of area that interested in (comment out when looking at peritumoral area)
@@ -491,6 +491,7 @@ df_enhancing_tumor_FU_avg = df_enhancing_tumor_FU.groupby("sub", as_index=False)
 df_enhancing_tumor_combined = pd.merge(df_enhancing_tumor_avg, df_enhancing_tumor_FU_avg, on="sub", suffixes = ('_T1', '_T2'))
 #df_enhancing_tumor_combined.to_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/03_dataframes/20240214_dataframe_enhancing_tumor_averaged_baseline_FU_combined.csv")
 
+# EK: consider splitting the script here?
 
 #%%
 ###########################################
@@ -512,7 +513,7 @@ df_cavity_combined_long.reset_index(inplace= True)
 
 #progression
 #Subjects that have progression before FU MEG or within 4 months after (N = 10)
-li_prog = ["sub-0017", "sub-0054", "sub-0069", "sub-0085",  "sub-0086", "sub-0099", "sub-9012", "sub-9022", "sub-9029", "sub-9032"]
+li_prog = ["sub-0017", "sub-0054", "sub-0069", "sub-0085",  "sub-0086", "sub-0099", "sub-9012", "sub-9022", "sub-9029", "sub-9032"] #EK: remove actual subject numbers from the script before making it public?
 df_cavity_combined_long["progression"] = df_cavity_combined_long["sub"].apply(lambda x: 'progression' if x in li_prog else 'no_progression')
 
 #epilepsy
@@ -700,7 +701,7 @@ df_cavity_change = prepare_df_COX(df_cavity_delta, "cavity")
 #df_cavity_change= pd.read_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/03_dataframes/20240226_dataframe_cavity_delta_perc_change_no_covs.csv")
 
 #%%
-#exclude patients with progression between T1 and T2 or censored date on T2 moment
+#exclude patients with progression between T1 and T2 or censored date on T2 moment        # EK: Consider avoiding this kind of manual insertion of subject numbers and aim to extract them somehow
 li_prog = ["sub-0054", "sub-0069", "sub-0099", "sub-9012", "sub-9029", "sub-9032","sub-9040"]
 
 df_cavity_change_excl_prog = df_cavity_change[~df_cavity_change["sub"].isin(li_prog)]
@@ -726,3 +727,10 @@ df_cavity_change_met_covariates_and_PFS = pd.merge(df[["Case_ID", "progr", "PFS_
 #%%
 
 df_cavity_change_met_covariates_and_PFS.to_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/03_dataframes/20240228_dataframe_cavity_delta_perc_change_no_prog_covs.csv")
+
+
+# EK general comments
+# Hide the actual paths - make them relative (i.e., ...analysis/data)
+# Avoid using actual subject numbers (pseudo-code them) and avoid inputting them manually into the script (try extracting them from a different database to avoid human error)
+# Uncomment the saving to csv files or remove? Or make a separate part for all the storing to the csvs?
+# Try to avoid the method to comment or uncomment a line in a script to do smth - rather try to rephrase it as an input argument
