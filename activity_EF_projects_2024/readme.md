@@ -10,3 +10,4 @@ The following scripts are provided:
 
 - anova_peritumoral.R, anova_cavity.R, anova_enhancing_tumor.R and cox_model.R are the R scripts used to investigate the relevance of clinical factors in the change in activity from baseline to follow-up for the different areas of interest (peritumoral area, peri-resection area, enhancing tumor area).
   
+# EK: consider linking to the preprint or later to the actual paper
