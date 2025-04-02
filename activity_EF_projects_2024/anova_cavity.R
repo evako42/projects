@@ -11,7 +11,7 @@
 #Under development/reviewed/final version
 
 #### Review History
-#Reviewed by: 
+#Reviewed by: Eva Koderman 02/04/2025
 #Date: 
 
 #### Load libraries
@@ -32,6 +32,8 @@ df_cavity <- read_csv(file_path_cavity_progression_mol)
 df_cavity_epilepsy <- read_csv(file_path_cavity_epilepsy)
 
 #turn necessary categorical columns into factors to use them as covariates in the analysis (returns same results as anova already interpreted the categorical vars as factors)
+
+#EK: Uncomment the lines below?
 
 #df_cavity$MM_factor <- factor(df_cavity$MM)
 #df_cavity$progression_factor <- factor(df_cavity$progression)
@@ -64,6 +66,7 @@ df_cavity %>%
   group_by(IDH_1p19q, MM) %>%
   get_summary_stats(BB_welch_z, type = 'mean_sd')
 
+#EK: as the same code is repeated, consider using a function instead
 
 # --- offset_z --- #
 #MM alone
@@ -86,7 +89,7 @@ df_cavity %>%
   group_by(IDH_1p19q, MM) %>%
   get_summary_stats(offset_z, type = 'mean_sd')
 
-
+#EK: similar here - you can make a function to groupby() and get_summary_stats() all in one line
 
 #### ----- Two-way repeated measures ANOVA (without taking into considertation transformations) ----- ####
 # --- BB_welch_z --- #
@@ -156,3 +159,6 @@ get_anova_table(res_aov_offset_mol)
 
 df_res_aov_offset_mol <- data.frame(res_aov_offset_mol)
 write.csv2(df_res_aov_offset_mol, 'M:\\MULTINET\\GOALS2\\06_projecten\\2023_activity_EF\\03_analysis\\01_results\\20240221_anova_offset_cavity_non_transformed_mol.csv', row.names = TRUE)
+
+#EK: consider checking for missing values when using ANOVA
+
