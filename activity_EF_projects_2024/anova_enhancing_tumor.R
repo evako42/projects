@@ -11,8 +11,8 @@
 #Under development/reviewed/final version
 
 #### Review History
-#Reviewed by: 
-#Date: 
+#Reviewed by: Eva Koderman
+#Date: 02/04/2025
 
 #### Load libraries
 library(tidyverse) 
@@ -32,6 +32,7 @@ df_enhancing_tumor <- read_csv(file_path_enhancing_tumor)
 df_epilepsy <- read_csv(file_path_enhancing_tumor_epilepsy)
 
 #turn necessary categorical columns into factors to use them as covariates in the analysis (returns same results as anova already interpreted the categorical vars as factors)
+#EK: uncomment below?
 
 #df_enhancing_tumor$MM_factor <- factor(df_enhancing_tumor$MM)
 #df_enhancing_tumor$progression_factor <- factor(df_enhancing_tumor$progression)
@@ -83,6 +84,8 @@ df_enhancing_tumor %>%
 df_enhancing_tumor %>%
   group_by(IDH_1p19q, MM) %>%
   get_summary_stats(offset_z, type = 'mean_sd')
+
+#EK: consider making a function and running one-liners
 
 # --> don't compute differences with molecular status and progression --> for both variables, only one subject has no_progression or an IDH-mutant glioma
 
