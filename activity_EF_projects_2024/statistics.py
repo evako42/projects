@@ -16,7 +16,7 @@ __status__ = "Production"
 # Review History   #
 ####################
 
-# Reviewed by 
+# Reviewed by Eva Koderman 02/04/2025
 
 
 ## Script for Statistical Analysis ##
@@ -38,10 +38,6 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 from statsmodels.compat import lzip
 import statsmodels.stats.api as sms
 import seaborn as sns
-# Third party imports ###
-# Internal imports ### 
-
-
 
 #%%
 
@@ -49,7 +45,7 @@ import seaborn as sns
 # DATAFRAME IMPORT #
 ####################
 
-#ATTENTION>>> to review this code it is easiest to first run the create_df_masks_overlaps.py 
+#ATTENTION>>> to review this code it is easiest to first run the create_df_masks_overlaps.py # EK: do you mean create_df.py script?
 #script ,for the patient data, and then use the created variables for the statistical analyses below.
 #For the healthy control data we can use the dataframes previously created by Christina, see below.
 
@@ -92,7 +88,7 @@ li_subs = pd.read_csv("/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023
 
 def paired_ttest (df_combined, activity_metrics, area, alpha = 0.05 ):
     '''
-    Paramters
+    Parameters
     ---------
     df_combined : pd.DataFrame,
         dataframe containing data on activityfor both baseline and FU 
@@ -282,7 +278,7 @@ def test_activity(df_patients, df_HCs_left, df_HCs_right,df_lateralization, area
     
     #results_all.to_csv(f'/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/04_results/test_against_HCs_{activity}_{area}_{time}.csv')
    
-    #return(results_all)
+    #return(results_all) #EK: uncomment?
         
         
 #%%
@@ -330,7 +326,7 @@ def ind_ttest(df_pat, df_HCs, area, activity, lateralization):
         results = stats.mannwhitneyu(df_pat[activity], df_HCs[activity])
         print(results)
         
-        
+        #EK: uncomment or remove below lines?
         
         # #append results to the results DataFrame
         # #results_df= results_df.append({'Area': area,
@@ -354,7 +350,9 @@ def ind_ttest(df_pat, df_HCs, area, activity, lateralization):
             print('Samples have equal variances, doing normal t-test')
             results = stats.ttest_ind(a=df_pat[activity], b=df_HCs[activity], equal_var=True)
             print(results)
-            
+
+          #EK: uncomment or remove below?
+      
             # #append results to the results DataFrame
             # results_df= results_df.append({'Area': area,
             #                                 'activity': activity, 
@@ -615,9 +613,10 @@ def run_multiple_linear_regression(df_activity, df_ef, EF_Score, area, output_di
     
     # Save the dataframe to CSV
     results_df.to_csv(f'{output_dir}linear_regression_baseline_{area}_{EF_Score}.csv')
-    #return(results_df)
+    #return(results_df) #EK: uncomment?
 #%%
 
+  
 ###############################
 ### Patient linear regression_baseline analysis ### 
 ###############################
@@ -652,8 +651,8 @@ def run_multiple_linear_regression(df_activity, df_ef, EF_Score, area, output_di
     #WFT
     run_multiple_linear_regression(df_contra_averaged, patient_info, 'flu_dier_corrected_1_Zscore', 'contralateral', output_dir, covariates=["Dummy_location_frontal_or_not", 'Dummy_IDH_WT', 'Dummy_IDHmut_noncodeleted'])
 
+#EK: consider splitting the script here?
 
-    
 #%%
 ####################   
 ### 2) to test relationship Activity vs EF (longitudinally) ###
@@ -685,7 +684,7 @@ def run_delta_regression(df_activity, df_ef, EF_Score, area, output_dir, covaria
         merge_df_org = pd.merge(df_activity, df_ef, left_on='sub', right_on='Case_ID')
         merge_df = pd.merge(df_activity, df_ef, left_on='sub', right_on='Case_ID')
 
-        #In case EF_Score = CST is analzyed --> remove sub-9038 and sub-0087 from DF
+        #In case EF_Score = CST is analzyed --> remove sub-9038 and sub-0087 from DF #EK: consider hiding subject IDs or using other pseudo-codes?
         if EF_Score == "cstc_corrected":
             merge_df.drop(merge_df[(merge_df["sub"] == "sub-9038")|(merge_df["sub"] == "sub-0087")].index, inplace = True)
             merge_df.reset_index(inplace = True)
@@ -858,7 +857,8 @@ def run_delta_regression(df_activity, df_ef, EF_Score, area, output_dir, covaria
 ### Patient linear regression_delta_scores analysis ### 
 ###############################
     output_dir = "/data/anw/anw-work/MULTINET/m.zimmermann/01_projects/2023_activity_EF/02_analysis/04_results"
-         
+
+  
 #Peritumoral
     #CST
     run_delta_regression(df_peri_combined, patient_info, 'cstc_corrected', 'peritumoral', output_dir, covariates=['Dummy_IDH_WT', 'Dummy_IDHmut_noncodeleted',"Dummy_CT_during_FU"])
@@ -884,6 +884,8 @@ def run_delta_regression(df_activity, df_ef, EF_Score, area, output_dir, covaria
 #%%        
         #WFT
     run_delta_regression(df_contra_combined, patient_info, 'flu_dier_corrected', 'contralateral', output_dir, covariates=['Dummy_IDH_WT', 'Dummy_IDHmut_noncodeleted','Dummy_RT', 'Dummy_RTandXT'])
+
+#EK: splitting again?
 
 #%%          
 ####################
