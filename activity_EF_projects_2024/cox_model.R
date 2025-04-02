@@ -13,8 +13,8 @@
 #Under development/reviewed/final version
 
 #### Review History
-#Reviewed by: 
-#Date: 
+#Reviewed by: Eva Koderman
+#Date: 02/04/2025
 
 #### Load libraries
 install.packages(c("survival", "survminer"))
@@ -25,7 +25,6 @@ library(tidyverse)
 
 #### Import Data
 path <- 'M:\\MULTINET\\GOALS2\\06_projecten\\2023_activity_EF\\04_analysis\\03_dataframes\\20240228_dataframe_cavity_delta_perc_change_no_prog_covs.csv'
-
 
 df_cavity <- read_csv(path)
 
@@ -55,3 +54,5 @@ summary(cox_model_BB_perc_change)
 #Offset_z
 cox_model_offset_perc_change <- coxph(Surv(PFS_weeks_MEG_FU, progr_bin) ~ offset_z_perc_change + age_at_diagnosis + sex_factor + IDH_1p19q_factor, data = df_cavity)
 summary(cox_model_offset_perc_change)
+
+#EK: all good!
