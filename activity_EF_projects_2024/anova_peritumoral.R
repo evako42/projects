@@ -12,8 +12,8 @@
 #Under development/reviewed/final version
 
 #### Review History
-#Reviewed by: 
-#Date: 
+#Reviewed by: Eva Koderman
+#Date: 02/04/2025
 
 #### Load libraries
 library(tidyverse) 
@@ -71,7 +71,7 @@ df_epilepsy %>%
   group_by(epilepsy_aed, MM) %>% 
   get_summary_stats(offset_z, type = 'mean_sd')
 
-
+#EK: like in other scripts - consider using a function
 #### ----- Visualize ----- ####
 
 # --- BB_welch_z --- #
@@ -118,7 +118,7 @@ df_epilepsy %>%
   shapiro_test(BB_welch_z)
 #Not normally distributed: Epilepsy_aed, T1_Baseline (0.0102) and T2_FU (0.007)
 
-
+# EK: Not sure about this but are you repeating some assumption checks from those already done in python when building the dataframe?
 
 
 # --- offset_z --- #
@@ -137,9 +137,6 @@ df_epilepsy %>%
   shapiro_test(offset_z)
 #Not normally distributed: 
 #epilepsy_aed, T2_FU p = 0.0001
-
-
-
 
 ### Assumption of sphericity 
 #(Greenhouse-Geisser correction automatically applied to factors violating 
@@ -261,7 +258,7 @@ get_anova_table(res_aov_offset_mol)
 df_res_aov_offset_mol <- data.frame(res_aov_offset_mol)
 write.csv2(df_res_aov_offset_mol, 'M:\\MULTINET\\GOALS2\\06_projecten\\2023_activity_EF\\03_analysis\\01_results\\20240221_anova_offset_peritumor_non_transformed_mol.csv', row.names = TRUE)
 
-
+#EK: consider using a different script for plots?
 
 #### ---- Plotting ---- #### 
 ## Raincloud plots 
@@ -430,3 +427,5 @@ raincloud_2x2 <- raincloud_2x2_repmes(
   theme_classic()
 
 raincloud_2x2
+
+#EK: consider making and using a function for repetitive lines of code in the plotting
